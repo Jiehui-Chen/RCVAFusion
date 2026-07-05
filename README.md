@@ -25,6 +25,8 @@ and camera through virtual points and achieves state-of-the-art performance.
 
 
 
+https://github.com/user-attachments/assets/10850a5d-d6d7-4cc9-9399-35e5804dde4b
+
 [Open the result visualization video](docs/ouput_compressed_h264.mp4)
 
 
