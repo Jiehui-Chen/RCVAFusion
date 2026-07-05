@@ -1,8 +1,29 @@
 # RCVAFusion
+## Abstract
 
-RCVAFusion is a radar-camera 3D object detection project built on top of
-MMDetection3D. This repository contains the model, dataset converters, custom
-CUDA operators, and configs for View-of-Delft (VoD) and TJ4DRadSet experiments.
+4D millimeter-wave radar plays a critical role in object detection for
+autonomous driving and robotics under all-weather and all-lighting conditions.
+Recently, virtual-point-based approaches have attracted widespread attention due
+to their ability to address radar data sparsity by complementing the depth of
+image instance points with the nearest 3D points. However, existing
+radar-camera fusion methods based on virtual points simply incorporate virtual
+points into the raw radar points as a form of data augmentation, overlooking the
+potential of virtual points that have an inherent association with both radar
+and images. To address these issues, we present a novel radar-camera fusion
+network, RCVAFusion, for 3D object detection. Specifically, we first design an
+association branch that employs Object Area Sampling (OAS) and Virtual-Raw
+Points Depth Lifting (VRPDL). This branch facilitates a deep interaction between
+radar geometric features and image semantic features through the medium of
+virtual points to generate an association feature. Then, we introduce the
+Dual-step Feature Aggregation (DFA) to promote feature fusion from radar, image,
+and association branches by establishing aggregation priorities based on feature
+similarity in two steps. Experimental results on the TJ4DRadSet and
+View-of-Delft (VoD) datasets demonstrate that our method efficiently fuses radar
+and camera through virtual points and achieves state-of-the-art performance.
+
+## Result Visualization
+
+[Watch the result visualization video](docs/ouput.mp4)
 
 ## Environment
 
@@ -31,42 +52,17 @@ bash setup_environment.sh
 Build the RCVAFusion custom operators:
 
 ```bash
-python projects/RCVAFusion/setup.py build_ext --inplace
+cd projects/RCVAFusion
+python setup.py build_ext --inplace
+cd ../..
 ```
 
-If CUDA is available but not detected by PyTorch during build, force CUDA
-compilation:
 
-```bash
-FORCE_CUDA=1 python projects/RCVAFusion/setup.py build_ext --inplace
-```
-
-The setup builds:
-
-```text
-projects.RCVAFusion.mmdet3d_plugin.models.sub_models.ops.bev_pool.bev_pool_ext
-projects.RCVAFusion.mmdet3d_plugin.models.sub_models.ops.voxel.voxel_layer
-```
 
 ## Data Preparation
 
-All dataset paths below are relative to the repository root. The configs expect
-the root data directory to be:
 
-```text
-data/
-```
-
-The converter scripts write final MMDetection3D-style info files directly under
-each dataset root. Intermediate files named `infos_train.pkl`,
-`infos_valid.pkl`, `infos_trainval.pkl`, and `infos_test.pkl` are removed by
-default after conversion.
-
-### View-of-Delft (VoD)
-
-Download and extract the official View-of-Delft public dataset. From the
-downloaded `view_of_delft_PUBLIC` directory, place or link the following
-subdirectories into `data/VoD`:
+1、Download and extract the official View-of-Delft public dataset. Place or link the following directories into `data/VoD`:
 
 ```text
 data/VoD/
@@ -90,76 +86,8 @@ data/VoD/
         └── velodyne/
 ```
 
-The files can be copied, or symbolic links can be used. For example:
 
-```bash
-mkdir -p data/VoD
-ln -s /path/to/view_of_delft_PUBLIC/lidar data/VoD/lidar
-ln -s /path/to/view_of_delft_PUBLIC/radar data/VoD/radar
-ln -s /path/to/view_of_delft_PUBLIC/radar_3frames data/VoD/radar_3frames
-ln -s /path/to/view_of_delft_PUBLIC/radar_5frames data/VoD/radar_5frames
-```
-
-Generate the VoD info files:
-
-```bash
-python projects/RCVAFusion/create_vod.py
-```
-
-Expected generated files:
-
-```text
-data/VoD/
-├── VOD_infos_train.pkl
-├── VOD_infos_valid.pkl
-├── VOD_infos_trainval.pkl
-└── VOD_infos_test.pkl
-```
-
-The VoD config uses:
-
-```python
-data_root = 'data/VoD'
-data_prefix = dict(
-    pts_lidar='lidar/training/velodyne',
-    img='lidar/training/image_2',
-    pts_radar='radar_5frames/training/velodyne')
-```
-
-For RCVAFusion training, virtual point files are also expected at:
-
-```text
-data/VoD/vod_virtual_points/
-```
-
-Each file should be named by sample id, for example:
-
-```text
-data/VoD/vod_virtual_points/00001.npy
-```
-
-The helper script `virtual_points_demo/vod_visual_points.py` is configured to
-read VoD data from `data/VoD` and can be used to generate these `.npy` files
-after setting its segmentation model arguments and output directory.
-
-Final prepared VoD layout:
-
-```text
-data/VoD/
-├── lidar/
-├── radar/
-├── radar_3frames/
-├── radar_5frames/
-├── vod_virtual_points/
-├── VOD_infos_train.pkl
-├── VOD_infos_valid.pkl
-├── VOD_infos_trainval.pkl
-└── VOD_infos_test.pkl
-```
-
-### TJ4DRadSet
-
-Download and extract TJ4DRadSet. Place or link the following directories into
+2、Download and extract TJ4DRadSet. Place or link the following directories into
 `data/TJ4DRadSet`:
 
 ```text
@@ -180,77 +108,31 @@ data/TJ4DRadSet/
 └── label_2/
 ```
 
-The converter uses radar point clouds from
-`TJ4DRadSet_4DRadar/training/velodyne`, camera images from
-`TJ4DRadSet_Non_Public/training/image_2`, calibration files from
-`TJ4DRadSet_4DRadar/training/calib`, and labels from `label_2`.
+3、You can download the virtual radar points and raw points from [Baidu](https://pan.baidu.com/s/1TK81mvDOqM-Ep3ktstdT5g?pwd=r483) and unzip them to the dataset folder.
 
-Example symbolic-link setup:
+4、(Optional) Or you can choose to generate virtual radar points by yourself following [here](virtual_points_demo/README.md).
 
-```bash
-mkdir -p data/TJ4DRadSet
-ln -s /path/to/TJ4DRadSet/TJ4DRadSet_4DRadar data/TJ4DRadSet/TJ4DRadSet_4DRadar
-ln -s /path/to/TJ4DRadSet/TJ4DRadSet_Non_Public data/TJ4DRadSet/TJ4DRadSet_Non_Public
-ln -s /path/to/TJ4DRadSet/TJ4DRadSet_LiDAR data/TJ4DRadSet/TJ4DRadSet_LiDAR
-ln -s /path/to/TJ4DRadSet/label_2 data/TJ4DRadSet/label_2
-```
-
-Generate the TJ4DRadSet info files:
+5、You can download the Dataset info files from [Baidu](https://pan.baidu.com/s/1cnKQiCxR8jmRxs80pZJmaA?pwd=jn6m) or generate them following:
 
 ```bash
+python projects/RCVAFusion/create_vod.py
 python projects/RCVAFusion/create_tj4d.py
 ```
 
-Expected generated files:
+6、Final prepared data layout:
 
 ```text
-data/TJ4DRadSet/
-├── TJ4DRadSet_infos_train.pkl
-├── TJ4DRadSet_infos_valid.pkl
-├── TJ4DRadSet_infos_trainval.pkl
-└── TJ4DRadSet_infos_test.pkl
+data/VoD/
+├── lidar/
+├── radar/
+├── radar_3frames/
+├── radar_5frames/
+├── vod_virtual_points/
+├── VOD_infos_train.pkl
+├── VOD_infos_valid.pkl
+├── VOD_infos_trainval.pkl
+└── VOD_infos_test.pkl
 ```
-
-Some prepared environments may also contain condition-specific validation info
-files:
-
-```text
-data/TJ4DRadSet/
-├── TJ4DRadSet_infos_dark.pkl
-├── TJ4DRadSet_infos_normal.pkl
-└── TJ4DRadSet_infos_shiny.pkl
-```
-
-These files use the same relative path format as the train/valid/test info
-files and can be consumed by configs that point `ann_file` to them.
-
-The TJ4DRadSet config uses:
-
-```python
-data_root = 'data/TJ4DRadSet'
-data_prefix = dict(
-    pts='TJ4DRadSet_4DRadar/training/velodyne',
-    img='TJ4DRadSet_Non_Public/training/image_2')
-```
-
-For RCVAFusion training, virtual point files are expected at:
-
-```text
-data/TJ4DRadSet/tj4d_virtual_points/
-```
-
-Each file should be named by sample id, for example:
-
-```text
-data/TJ4DRadSet/tj4d_virtual_points/020000.npy
-```
-
-The helper script `virtual_points_demo/tj4d_visual_points.py` is configured to
-read TJ4DRadSet data from `data/TJ4DRadSet` and can be used to generate these
-`.npy` files after setting its segmentation model arguments and output
-directory.
-
-Final prepared TJ4DRadSet layout:
 
 ```text
 data/TJ4DRadSet/
@@ -264,50 +146,41 @@ data/TJ4DRadSet/
 ├── TJ4DRadSet_infos_trainval.pkl
 └── TJ4DRadSet_infos_test.pkl
 ```
+## Model Zoo
 
-## Configs
+We retrained the model and achieved better performance compared to the results
+reported in the tables of the paper. We provide the checkpoints on
+View-of-Delft (VoD) and TJ4DRadSet datasets, reproduced with the released
+codebase.
 
-Main RCVAFusion configs:
+| Dataset | Backbone | EAA 3D mAP | DC 3D mAP | Model Weights |
+| --- | --- | ---: | ---: | --- |
+| [View-of-Delft](https://tudelft-iv.github.io/view-of-delft-dataset/) | ResNet50 | 62.85 | 82.32 | [Link](https://pan.baidu.com/s/1mvwh3tI3d450nZ7vwQ-p0A?pwd=c7av) |
+| [TJ4DRadSet](https://pan.baidu.com/s/1PmTIOtQBLAIICEAPM4-fOg?pwd=g7na) | ResNet50 | 42.05 | 49.35 | [Link]() |
 
-```text
-projects/RCVAFusion/configs/vod_rcvafusion.py
-projects/RCVAFusion/configs/tj4d_rcvafusion.py
+## Training and Evaluating
+1、We provide pre-trained image backbone models from [baidu](https://pan.baidu.com/s/1BoEuRNyYMtBhUKW-hYmDEQ?pwd=9g88) .
+
+2、train RCVAFusion with 4 GPUs:
+```bash
+bash tools/dist_train.sh projects/RCVAFusion/configs/vod_rcvafusion.py 4
+bash tools/dist_train.sh projects/RCVAFusion/configs/tj4d_rcvafusion.py 4
 ```
 
-Both configs import the project plugin:
-
-```python
-custom_imports = dict(imports=['projects.RCVAFusion.mmdet3d_plugin'])
-```
-
-Make sure commands are run from the repository root so relative paths such as
-`data/VoD` and `data/TJ4DRadSet` resolve correctly.
-
-## Quick Checks
-
-Check that the converted info files exist:
+3、test RCVAFusion with single GPU:
 
 ```bash
-ls data/VoD/VOD_infos_*.pkl
-ls data/TJ4DRadSet/TJ4DRadSet_infos_*.pkl
+python tools/test.py projects/RCVAFusion/configs/vod_rcvafusion.py ckpts/vod_rcvafusion.pth
+python tools/test.py projects/RCVAFusion/configs/tj4d_rcvafusion.py ckpts/tj4d_rcvafusion.pth
 ```
 
-Check that the custom ops are importable:
+## Acknowledgements
+Many thanks to the open-source repositories:
 
-```bash
-python - <<'PY'
-from projects.RCVAFusion.mmdet3d_plugin.models.sub_models.ops.bev_pool import bev_pool
-from projects.RCVAFusion.mmdet3d_plugin.models.sub_models.ops.voxel import voxelize
-print('RCVAFusion ops import OK')
-PY
-```
+[mmdetection3d](https://github.com/open-mmlab/mmdetection3d)
 
-## Notes
+[mask2former](https://github.com/facebookresearch/Mask2Former)
 
-- `projects/RCVAFusion/create_vod.py` and
-  `projects/RCVAFusion/create_tj4d.py` should be run from the repository root.
-- The generated final info files store point cloud and image file names as
-  relative paths. The dataset classes combine them with `data_root` and
-  `data_prefix` from the configs.
-- If you keep datasets outside this repository, symbolic links under `data/`
-  are recommended.
+[SGDet3D](https://github.com/shawnnnkb/SGDet3D)
+
+[HGSFusion](https://github.com/garfield-cpp/HGSFusion)

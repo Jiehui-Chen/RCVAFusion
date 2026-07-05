@@ -410,5 +410,5 @@ train_cfg = dict(by_epoch=True, max_epochs=12, val_interval=1)
 val_cfg = dict()
 test_cfg = dict()
 
-auto_scale_lr = dict(enable=False, base_batch_size=9)
-load_from = '/home/chenjh/Documents/mmdetection3d/ckpts/img-checkpoint.pth'
+auto_scale_lr = dict(enable=False, base_batch_size=12)
+load_from = 'ckpts/img-checkpoint.pth'

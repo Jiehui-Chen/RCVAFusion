@@ -419,4 +419,4 @@ test_cfg = dict()
 
 auto_scale_lr = dict(enable=False, base_batch_size=12)
 
-load_from = '/home/chenjh/Documents/mmdetection3d/ckpts/img-checkpoint.pth'
+load_from = 'ckpts/img-checkpoint.pth'

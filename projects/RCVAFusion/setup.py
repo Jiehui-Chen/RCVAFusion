@@ -5,6 +5,9 @@ from setuptools import setup
 import torch
 from torch.utils.cpp_extension import BuildExtension, CppExtension, CUDAExtension
 
+SETUP_DIR = os.path.dirname(os.path.abspath(__file__))
+os.chdir(SETUP_DIR)
+
 
 def make_cuda_ext(name,
                   module,
@@ -53,16 +56,14 @@ if __name__ == '__main__':
         ext_modules=[
             make_cuda_ext(
                 name='bev_pool_ext',
-                module=('projects.RCVAFusion.mmdet3d_plugin.models.'
-                        'sub_models.ops.bev_pool'),
+                module='mmdet3d_plugin.models.sub_models.ops.bev_pool',
                 sources=[
                     'src/bev_pool.cpp',
                     'src/bev_pool_cuda.cu',
                 ]),
             make_cuda_ext(
                 name='voxel_layer',
-                module=('projects.RCVAFusion.mmdet3d_plugin.models.'
-                        'sub_models.ops.voxel'),
+                module='mmdet3d_plugin.models.sub_models.ops.voxel',
                 sources=[
                     'src/voxelization.cpp',
                     'src/scatter_points_cpu.cpp',
