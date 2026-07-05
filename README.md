@@ -162,7 +162,7 @@ codebase.
 | Dataset | Backbone | EAA 3D mAP | DC 3D mAP | Model Weights |
 | --- | --- | ---: | ---: | --- |
 | [View-of-Delft](https://tudelft-iv.github.io/view-of-delft-dataset/) | ResNet50 | 62.85 | 82.32 | [Link](https://pan.baidu.com/s/1mvwh3tI3d450nZ7vwQ-p0A?pwd=c7av) |
-| [TJ4DRadSet](https://pan.baidu.com/s/1PmTIOtQBLAIICEAPM4-fOg?pwd=g7na) | ResNet50 | 42.05 | 49.35 | [Link]() |
+| [TJ4DRadSet](https://github.com/TJRadarLab/TJ4DRadSet) | ResNet50 | 42.05 | 49.35 | [Link](https://pan.baidu.com/s/1PmTIOtQBLAIICEAPM4-fOg?pwd=g7na) |
 
 ## Training and Evaluating
 1、We provide pre-trained image backbone models from [baidu](https://pan.baidu.com/s/1BoEuRNyYMtBhUKW-hYmDEQ?pwd=9g88) .
