@@ -23,11 +23,12 @@ and camera through virtual points and achieves state-of-the-art performance.
 
 ## Result Visualization
 
-<video src="docs/ouput_compressed.mp4" controls muted width="100%">
-  Your browser does not support the video tag.
-</video>
+https://github.com/user-attachments/assets/4904e586-68b3-472c-9d62-d47654219508
 
 [Open the result visualization video](docs/ouput_compressed.mp4)
+
+
+
 
 ## Environment
 
