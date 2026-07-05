@@ -23,10 +23,9 @@ and camera through virtual points and achieves state-of-the-art performance.
 
 ## Result Visualization
 
-https://github.com/user-attachments/assets/4904e586-68b3-472c-9d62-d47654219508
 
-[Open the result visualization video](docs/ouput_compressed.mp4)
 
+[Open the result visualization video](docs/ouput_compressed_h264.mp4)
 
 
 
